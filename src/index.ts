@@ -45,47 +45,16 @@ interface IGeradorVideo { // Novo recurso solicitado
     gerarVideo(prompt: string): string;
 }
 
-// 3. A classe principal que gerencia tudo
-class AssistenteOmniIA implements IModelosIA {
-    public nomeModelo: string;
+// --- 4. O.C.P. (Open/Closed Principle) ---
+// O Assistente agora é aberto para extensão e fechado para modificação.
+// Ele processa qualquer modelo que siga o contrato, sem precisar de if/else para tipos.
+class AssistenteOmniIA {
+    constructor(private financeiro: ServicoFinanceiro) {}
 
-    constructor(nomeModelo: string) {
-        this.nomeModelo = nomeModelo;
-    }
-
-    // Processador central cheio de condicionais
-    processarRequisicaoUsuario(prompt: string, tipo: string): void {
-        console.log(`Iniciando processamento com ${this.nomeModelo}...`);
-
-        if (tipo === "TEXTO") {
-            this.gerarTexto(prompt);
-        } else if (tipo === "IMAGEM") {
-            this.gerarImagem(prompt);
-        } else if (tipo === "AUDIO") {
-            this.gerarAudio(prompt);
-        } else {
-            throw new Error("Tipo de IA não suportado pelo sistema.");
-        }
-       
-        // Finaliza cobrando o usuário direto aqui
-        this.registrarCobranca(1.50);
-    }
-
-    gerarTexto(prompt: string): string {
-        return `[Texto Gerado]: Respondendo ao prompt: ${prompt}`;
-    }
-
-    gerarImagem(prompt: string): string {
-        return `[Imagem Gerada]: URL da imagem baseada em: ${prompt}`;
-    }
-
-    gerarAudio(prompt: string): string {
-        return `[Áudio Gerado]: Arquivo de voz para: ${prompt}`;
-    }
-
-    registrarCobranca(valor: number): void {
-        const stripe = new SistemaCobrancaStripe();
-        stripe.cobrar("user_999", valor);
+    // O método agora recebe o modelo e o valor, sem se preocupar com a implementação interna
+    processarServico(usuarioId: string, valor: number, acao: () => string): void {
+        this.financeiro.executarCobranca(usuarioId, valor);
+        console.log(acao());
     }
 }
 
@@ -108,3 +77,17 @@ class ModeloSora implements IGeradorVideo {
         return `Vídeo gerado pela Sora: ${prompt}`;
     }
 }
+
+// --- EXEMPLO DE USO ---
+const pagamentoStripe = new SistemaCobrancaStripe();
+const financeiro = new ServicoFinanceiro(pagamentoStripe);
+const assistente = new AssistenteOmniIA(financeiro);
+
+const chatGPT = new ModeloChatGPT();
+const sora = new ModeloSora();
+
+// Gerando Texto
+assistente.processarServico("user_01", 10, () => chatGPT.gerarTexto("Olá, SOLID!"));
+
+// Gerando Vídeo (Novo recurso adicionado sem quebrar o código antigo)
+assistente.processarServico("user_02", 50, () => sora.gerarVideo("Um robô programando"));
