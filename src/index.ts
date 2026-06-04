@@ -89,17 +89,22 @@ class AssistenteOmniIA implements IModelosIA {
     }
 }
 
-// 4. Um modelo específico sendo forçado a herdar o que não deve
-class ModeloFocadoEmTexto extends AssistenteOmniIA {
-    constructor() {
-        super("ChatGPT-4");
+// --- 3. L.S.P. (Liskov Substitution Principle) ---
+// As classes agora implementam apenas o que realmente entregam.
+class ModeloChatGPT implements IGeradorTexto {
+    gerarTexto(prompt: string): string {
+        return `Texto gerado pelo ChatGPT: ${prompt}`;
     }
+}
 
+class ModeloDallE implements IGeradorImagem {
     gerarImagem(prompt: string): string {
-        throw new Error("Falha Crítica: O ChatGPT-4 não gera imagens nativamente nesta versão.");
+        return `Imagem gerada pelo Dall-E para: ${prompt}`;
     }
+}
 
-    gerarAudio(prompt: string): string {
-        throw new Error("Falha Crítica: Modelo de texto não pode gerar arquivos de áudio.");
+class ModeloSora implements IGeradorVideo {
+    gerarVideo(prompt: string): string {
+        return `Vídeo gerado pela Sora: ${prompt}`;
     }
 }
