@@ -27,11 +27,22 @@ class ServicoFinanceiro {
     }
 }
 
-// 2. Interface "Faz-Tudo"
-interface IModelosIA {
+/ --- 2. I.S.P. (Interface Segregation Principle) ---
+// Dividimos a interface "faz-tudo" em interfaces menores e específicas.
+interface IGeradorTexto {
     gerarTexto(prompt: string): string;
+}
+
+interface IGeradorImagem {
     gerarImagem(prompt: string): string;
+}
+
+interface IGeradorAudio {
     gerarAudio(prompt: string): string;
+}
+
+interface IGeradorVideo { // Novo recurso solicitado
+    gerarVideo(prompt: string): string;
 }
 
 // 3. A classe principal que gerencia tudo
