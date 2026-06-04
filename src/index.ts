@@ -1,7 +1,29 @@
-// 1. Sistema de cobrança engessado
-class SistemaCobrancaStripe {
-    cobrar(usuarioId: string, valorTokens: number): void {
-        console.log(`Cobrando R$${valorTokens} via Stripe do usuário ${usuarioId}`);
+// --- 1. D.I.P. (Dependency Inversion Principle) & S.R.P. (Single Responsibility Principle) ---
+// Criamos uma interface para o sistema de cobrança para que o sistema não dependa do Stripe.
+interface IMetodoPagamento {
+    processar(usuarioId: string, valor: number): void;
+}
+
+// Implementação concreta do Stripe
+class SistemaCobrancaStripe implements IMetodoPagamento {
+    processar(usuarioId: string, valor: number): void {
+        console.log(`Cobrando R$${valor} via Stripe do usuário ${usuarioId}`);
+    }
+}
+
+// Implementação de um novo método (ex: PayPal) sem alterar a lógica central (O.C.P.)
+class SistemaCobrancaPayPal implements IMetodoPagamento {
+    processar(usuarioId: string, valor: number): void {
+        console.log(`Cobrando R$${valor} via PayPal do usuário ${usuarioId}`);
+    }
+}
+
+// Serviço de cobrança isolado (S.R.P.)
+class ServicoFinanceiro {
+    constructor(private metodoPagamento: IMetodoPagamento) {}
+
+    executarCobranca(usuarioId: string, valor: number): void {
+        this.metodoPagamento.processar(usuarioId, valor);
     }
 }
 
